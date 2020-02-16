@@ -1,0 +1,46 @@
+[MASTER]
+
+# Add files or directories to the blacklist. They should be base names, not
+# paths.
+ignore=
+    .git
+    .idea
+    .venv
+    .vscode
+    .mypy_cache
+    .pytest_cache
+    __pycache__
+    output
+    dist
+    build
+    lib
+    out
+    tmp
+
+
+[MESSAGES CONTROL]
+disable=
+    logging-fstring-interpolation,
+    logging-format-interpolation,
+    useless-super-delegation,
+    unused-wildcard-import,
+    missing-docstring,
+    ungrouped-imports,
+    wildcard-import,
+    unused-import,
+    format
+
+[FORMAT]
+max-line-length=129
+
+[TYPECHECK]
+
+# List of decorators that produce context managers, such as
+# contextlib.contextmanager. Add to this list to register other decorators that
+# produce valid context managers.
+contextmanager-decorators=contextlib.contextmanager
+
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+generated-members=re\..*

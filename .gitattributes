@@ -1,0 +1,10 @@
+* text=auto
+
+pyproject.toml text=lf
+poetry.lock text=lf
+
+*.lua text=lf
+
+*.dll binary
+*.exe binary
+*.png binary

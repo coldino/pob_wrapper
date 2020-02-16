@@ -1,0 +1,52 @@
+{
+    "files.exclude": {
+        ".venv": true,
+        "*.egg-info": true,
+        "build/": true,
+        "dist/": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true,
+        "**/.ropeproject": true,
+    },
+
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.lintOnSave": true,
+    "python.jediEnabled": false,
+    "python.sortImports.args": ["--settings-path=${workspaceFolder}/setup.cfg"],
+    "python.formatting.provider": "yapf",
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "python.pythonPath": ".venv\\Scripts\\python.exe",
+
+    "git.ignoreLimitWarning": true,
+
+    "coverage-gutters.xmlname": "coverage.xml",
+    "coverage-gutters.ignoredPathGlobs": "{output,out,build,dist,lib,logs,tmp,.vscode,.venv,.git}/**",
+
+    "cSpell.diagnosticLevel": "Hint",
+    "cSpell.words": [
+        "consts",
+        "functools",
+        "isabs",
+        "isnumeric",
+        "itertools",
+        "klass",
+        "mkdir",
+        "mkdirs",
+        "mypy",
+        "pylint",
+        "pytest",
+        "rfind"
+    ]
+}
