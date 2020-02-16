@@ -6,6 +6,7 @@ description = "Wrapper to control Path of Building"
 authors = ["coldino <antoranthony.purchase@gmail.com>"]
 license = "LGPL-3.0-or-later"
 keywords = ['pathofexile','pathofbuilding','pob']
+homepage = 'https://github.com/coldino/pob_wrapper/'
 packages = [
     { include = "pob_wrapper" },
     { include = "tests", format = "sdist" },
