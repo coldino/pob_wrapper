@@ -76,7 +76,7 @@ Path('test-item1.html').write_text(pob.test_item_as_html(item))
 ```
 ...produces something like the page below, although any item copied from a trade website will be handled.
 
-![Item test output](readme_imgs\test_item_1_html.png)
+![Item test output](readme_imgs/test_item_1_html.png)
 
 
 ## Things to improve
