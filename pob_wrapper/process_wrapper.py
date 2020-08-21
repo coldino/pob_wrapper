@@ -32,7 +32,7 @@ class ProcessWrapper:
     '''Starts a sub-process that can be used in a simple question/response pattern.'''
     process: Popen
 
-    receive_msg_fn = lambda msg:...
+    receive_msg_fn = lambda self, msg: print("Lua:", msg)
 
     def start(self, args: List[str], cwd=None):
         cwd = cwd or os.getcwd()
@@ -65,12 +65,12 @@ class ProcessWrapper:
 
     def get(self):
         line = self.process.stdout.readline()
-        # print(">>> "+line)
+        # print(">>> " + line)
         return line
 
     def put(self, line):
         line = line.replace('\n', '\\n')
-        # print("<<< "+line)
+        # print("<<< " + line)
         self.process.stdin.write(line)
         self.process.stdin.write('\n')
         self.process.stdin.flush()
