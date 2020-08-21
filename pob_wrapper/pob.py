@@ -127,6 +127,19 @@ class PathOfBuilding:
         changes = _calculate_diff(result['base'], result['new'])
         return changes
 
+    def echo(self, msg: str):
+        msg = safe_string(msg)
+        self._send(f'echo_message("{msg}")')
+
+    def error(self, msg: str):
+        msg = safe_string(msg)
+        self._send(f'echo_error("{msg}")')
+
+    def fetch(self, msg: str):
+        '''Warning: msg must be valid Lua format'''
+        result = self._send(f'echo_result({msg})')
+        return result
+
     def _send(self, line, ignore_result=False) -> Any:
         result = self.pob.send(line, ignore_result=ignore_result)
         if ignore_result:

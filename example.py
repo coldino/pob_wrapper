@@ -40,6 +40,9 @@ def run():
     pob.load_build(rf'{builds_path}\Experiment\ZioniclesExperiment.xml')
     pprint(pob.get_build_info())
 
+    print('\nUpdating build:')
+    pob.update_build()
+
     mod = "10% increased Intelligence"
     print('\nTesting single mod effects:', mod)
     pprint(pob.test_mod_effect(mod))
@@ -47,8 +50,14 @@ def run():
     print('\nGenerating HTML from item effects test: ./test-item1.html')
     Path('test-item1.html').write_text(pob.test_item_as_html(TEST_ITEM_1))
 
+    print('\nFetch data directly from Lua:')
+    print('  build.spec.curAscendClassName = ', end='')
+    pprint(pob.fetch('build.spec.curAscendClassName'))
+
     # `pob` is killed automatically
+
+    return pob
 
 
 if __name__ == '__main__':
-    run()
+    pob = run()

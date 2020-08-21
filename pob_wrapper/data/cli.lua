@@ -1,6 +1,19 @@
 
 -- External interface methods
 
+function echo_message(msg)
+    print(msg)
+    return true
+end
+
+function echo_result(msg)
+    return msg
+end
+
+function echo_error(msg)
+    error(msg)
+end
+
 function getBuildsDir()
     return mainObject.main.buildPath
 end
