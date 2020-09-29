@@ -65,7 +65,9 @@ def _calculate_diff(base_values, new_values):
             continue
         if _num_string(base_value) == _num_string(new_value):  # the same to 10 significant figures
             continue
-        changes[field] = float(_num_string(new_value - base_value))
+        # Nighty: added dps as % to return value (which is now a tuple)
+        changes[field] = ( float(_num_string(new_value - base_value)), 
+                          round(((new_value - base_value) / base_value ) * 100, 2) )
     return changes
 
 
@@ -94,6 +96,17 @@ class PathOfBuilding:
 
     def update_build(self):
         result = self._send(f'updateBuild()')
+        return result
+
+    # Nighty: added save function
+    def save_build(self):
+        result = self._send(f'saveBuild()')
+        return result
+
+     # Nighty: added save_as function
+    def save_build_as(self, path: str):
+        path = safe_string(path)
+        result = self._send(f'saveBuildAs("{path}")', ignore_result=True)
         return result
 
     def get_build_info(self):
