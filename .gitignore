@@ -6,6 +6,8 @@ logs/
 id_*
 tmp/
 
+test*.html
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

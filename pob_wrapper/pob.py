@@ -70,13 +70,14 @@ def _calculate_diff(base_values, new_values):
 
 
 class PathOfBuilding:
-    def __init__(self, pob_path, pob_install):
+    def __init__(self, pob_path, pob_install, verbose=False):
+        self.verbose = verbose and True
         data_dir = pkg_resources.resource_filename('pob_wrapper', 'data')
 
         os.environ['LUA_PATH'] = f'{data_dir}\\?.lua;{pob_path}\\lua\\?.lua;{pob_install}\\lua\\?.lua'
         os.environ['LUA_CPATH'] = f'{pob_install}\\?.dll'
 
-        self.pob = ProcessWrapper()
+        self.pob = ProcessWrapper(debug=self.verbose)
         self.pob.start([f'{data_dir}/luajit.exe', f'{data_dir}\\cli.lua'], cwd=pob_path)
         atexit.register(self.kill)
 

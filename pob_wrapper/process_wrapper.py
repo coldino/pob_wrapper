@@ -34,10 +34,14 @@ class ProcessWrapper:
 
     receive_msg_fn = lambda self, msg: print("Lua:", msg)
 
+    def __init__(self, debug=False):
+        self.debug = debug and True
+
     def start(self, args: List[str], cwd=None):
         cwd = cwd or os.getcwd()
         self.process = Popen(args, stdin=PIPE, stdout=PIPE, stderr=sys.stderr, universal_newlines=True, cwd=cwd, bufsize=1)
-        print(self.process.stdout.readline())
+        firstline = self.process.stdout.readline()
+        if self.debug: print('===', firstline)
 
     def send(self, txt, ignore_result=False):
         '''Not yet thread-safe!'''
@@ -65,12 +69,12 @@ class ProcessWrapper:
 
     def get(self):
         line = self.process.stdout.readline()
-        # print(">>> " + line)
+        if self.debug: print('>>>', line)
         return line
 
     def put(self, line):
         line = line.replace('\n', '\\n')
-        # print("<<< " + line)
+        if self.debug: print('<<<', line)
         self.process.stdin.write(line)
         self.process.stdin.write('\n')
         self.process.stdin.flush()
