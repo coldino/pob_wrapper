@@ -5,7 +5,7 @@ from typing import *
 
 import pkg_resources
 
-from .process_wrapper import ExternalError, ProcessWrapper, safe_string
+from .process_wrapper import ProcessWrapper, safe_string
 
 HTML_ITEM_HEADER = r'''<html><head>
 <!-- /* A font by Jos Buivenga (exljbris) -> www.exljbris.com */ -->
@@ -29,6 +29,11 @@ html {
 </style>
 </head><body>
 '''
+
+
+class ExternalError(Exception):
+    def __init__(self, status):
+        self.status = status
 
 
 def _num_string(value):

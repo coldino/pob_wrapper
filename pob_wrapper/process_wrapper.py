@@ -17,10 +17,6 @@ START_RESULT = '!*------------*!'
 END_RESULT = '!*<<<<<<<<<<<<*!'
 
 
-class ExternalError(Exception):
-    pass
-
-
 def safe_string(txt):
     txt = txt.replace('\\', '\\\\')
     txt = txt.replace('\n', '\\n')

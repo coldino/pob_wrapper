@@ -287,7 +287,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
     buffer[buflen] = value and "true" or "false"
   elseif valtype == 'function' then
     buflen = buflen + 1
-    buffer[buflen] = tostring(value)
+    buffer[buflen] = "\""..tostring(value).."\""
   elseif valtype == 'string' then
     buflen = buflen + 1
     buffer[buflen] = quotestring (value)

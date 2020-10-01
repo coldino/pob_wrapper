@@ -7,6 +7,7 @@ id_*
 tmp/
 
 test*.html
+.repl-history
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
