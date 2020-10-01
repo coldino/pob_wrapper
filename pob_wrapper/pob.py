@@ -4,6 +4,7 @@ import re
 from typing import *
 
 import pkg_resources
+from win32com.shell import shell, shellcon
 
 from .process_wrapper import ProcessWrapper, safe_string
 
@@ -78,9 +79,15 @@ class PathOfBuilding:
     def __init__(self, pob_path, pob_install, verbose=False):
         self.verbose = verbose and True
         data_dir = pkg_resources.resource_filename('pob_wrapper', 'data')
+        docs = shell.SHGetFolderPath(0, shellcon.CSIDL_PERSONAL, None, 0)
 
+        os.environ['PATH'] = f'{pob_install};{os.environ["PATH"]}'
         os.environ['LUA_PATH'] = f'{data_dir}\\?.lua;{pob_path}\\lua\\?.lua;{pob_install}\\lua\\?.lua'
         os.environ['LUA_CPATH'] = f'{pob_install}\\?.dll'
+
+        os.environ['POB_USERPATH'] = docs
+        os.environ['POB_SCRIPTPATH'] = pob_path
+        os.environ['POB_RUNTIMEPATH'] = pob_install
 
         self.pob = ProcessWrapper(debug=self.verbose)
         self.pob.start([f'{data_dir}/luajit.exe', f'{data_dir}\\cli.lua'], cwd=pob_path)
