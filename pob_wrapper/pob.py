@@ -106,8 +106,7 @@ class PathOfBuilding:
         self._send(f'loadBuild("{path}")', ignore_result=True)
 
     def update_build(self):
-        result = self._send(f'updateBuild()')
-        return result
+        self._send(f'updateBuild()', ignore_result=True)
 
     def get_build_info(self):
         result = self._send(f'getBuildInfo()')

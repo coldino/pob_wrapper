@@ -1,60 +1,36 @@
-local pob = {}
+--[==[
+    Methods that delve into the core of PoB and do useful things.
+]==]--
 
--- External interface methods
+local pobinterface = {}
 
-function pob.echo_message(msg)
-    print(msg)
-    return true
+
+function pobinterface.loadBuild(path)
+    local buildXml = loadText(path)
+    loadBuildFromXML(buildXml)
+    build.buildName = getFilename(path)
+    build.dbFileName = path
+    build.dbFileSubPath = ''
 end
 
-function pob.echo_result(msg)
-    return msg
-end
 
-function pob.echo_error(msg)
-    error(msg)
-end
-
-function pob.getBuildsDir()
-    return mainObject.main.buildPath
-end
-
-function pob.getBuildInfo(out)
-    out = out or {}
-    out.buildName = build.buildName
-    out.file = {path=build.dbFileName, subpath = build.dbFileSubPath}
-    out.char = {
-        level = build.characterLevel or 1,
-        className = build.spec.curClassName,
-        ascendClassName = (build.spec.curAscendClassName ~= "None" and build.spec.curAscendClassName) or build.spec.curClassName or "?",
-    }
-    return out
-end
-
-function pob.loadBuild(path)
-    loadBuildFromPath(path)
-    result = getBuildInfo()
-    return result
-end
-
-function pob.saveBuild()
+function pobinterface.saveBuild()
     if not build.dbFileName then
-        error("Attempting to save a build with no filename")
+        error("Unable to save - no build path set")
     end
+
+    build.actionOnSave = nil -- Avoid post-save actions like app update, exit
     build:SaveDBFile()
 end
 
-function pob.saveBuildAs(path)
+
+function pobinterface.saveBuildAs(path)
     local saveXml = saveBuildToXml()
     saveText(path, saveXml)
 end
 
-function pob.updateBuild()
-    -- Update a build from the PoE website automatically, attempting to ensure skills are restored after import
 
-    result = {}
-
-    -- Remember chosen skill and part
+function pobinterface.readSkillSelection()
     local pickedGroupIndex = build.mainSocketGroup
     local socketGroup = build.skillsTab.socketGroupList[pickedGroupIndex]
     local pickedGroupName = socketGroup.displayLabel
@@ -65,18 +41,45 @@ function pob.updateBuild()
     local pickedPartIndex = activeEffect.grantedEffect.parts and activeEffect.srcInstance.skillPart
     local pickedPartName = activeEffect.grantedEffect.parts and activeEffect.grantedEffect.parts[pickedPartIndex].name
 
-    result.character = build.buildName
-    result.currentSkill = {group=pickedGroupName, name=pickedActiveSkillName, part=(pickedPartName or '-')}
+    return {
+        group = pickedGroupName,
+        name = pickedActiveSkillName,
+        part = pickedPartName,
+    }
+end
+
+
+function getFilename(path)
+    local start, finish = path:find('[%w%s!-={-|]+[_%.].+')
+    local name = path:sub(start,#path)
+    if name:sub(-4) == '.xml' then
+        name = name:sub(0, -5)
+    end
+    return name
+end
+
+
+function pobinterface.skillString(skill)
+    return ""..(skill.group or '-').." / "..(skill.name or '-').." / "..(skill.part or '-')
+end
+
+
+function pobinterface.updateBuild()
+    -- Update a build from the PoE website automatically, ensuring skills are restored after import
+
+    -- Remember chosen skill and part
+    local prevSkill = pobinterface.readSkillSelection()
+    print("Previous skill group/gem/part: "..pobinterface.skillString(prevSkill))
 
     -- Check we have an account name
     if not isValidString(build.importTab.controls.accountName.buf) then
-        error("Account name not configured")
+        error("Account name not configured for import")
     end
-    result.account = build.importTab.controls.accountName.buf
+    -- result.account = build.importTab.controls.accountName.buf
 
     -- Check we have a character name
     if not build.importTab.lastCharacterHash or not isValidString(build.importTab.lastCharacterHash:match("%S")) then
-        error("Import not configured for this character")
+        error("Character name not configured for import")
     end
 
     -- Get character list
@@ -101,14 +104,16 @@ function pob.updateBuild()
     build:RefreshSkillSelectControls(build.controls, build.mainSocketGroup, "")
 
     -- Restore chosen skills
+    local newSkill = pobinterface.readSkillSelection()
+    print("After update skill group/gem/part: "..pobinterface.skillString(newSkill))
     local newGroupIndex = build.mainSocketGroup
     socketGroup = build.skillsTab.socketGroupList[newGroupIndex]
     local newGroupName = socketGroup.displayLabel
 
-    if newGroupName ~= pickedGroupName then
-        print("Socket group name doesn't match... fixing")
+    if newGroupName ~= prevSkill.group then
+        print("Socket group name '"..(newSkill.group).."' doesn't match... fixing")
         for i,grp in pairs(build.skillsTab.socketGroupList) do
-            if grp.displayLabel == pickedGroupName then
+            if grp.displayLabel == prevSkill.group then
                 build.mainSocketGroup = i
                 newGroupIndex = i
                 socketGroup = build.skillsTab.socketGroupList[newGroupIndex]
@@ -116,20 +121,20 @@ function pob.updateBuild()
                 break
             end
         end
-        if newGroupName ~= pickedGroupName then
-            error("Previous socket group not found")
+        if newGroupName ~= prevSkill.group then
+            error("Unable to update safely: Previous socket group not found (was '"..prevSkill.group.."')")
         end
     end
 
     local newActiveSkillIndex = socketGroup.mainActiveSkill
     local displaySkill = socketGroup.displaySkillList[newActiveSkillIndex]
-    local activeEffect = displaySkill.activeEffect
-    local newActiveSkillName = activeEffect.grantedEffect.name
+    local activeEffect = displaySkill and displaySkill.activeEffect
+    local newActiveSkillName = activeEffect and activeEffect.grantedEffect.name
 
-    if newActiveSkillName ~= pickedActiveSkillName then
-        print("Active skill doesn't match... fixing")
+    if newActiveSkillName ~= prevSkill.name then
+        print("Active skill '"..(newSkill.name).."' doesn't match... fixing")
         for i,skill in pairs(socketGroup.displaySkillList) do
-            if skill.activeEffect.grantedEffect.name == pickedActiveSkillName then
+            if skill.activeEffect.grantedEffect.name == prevSkill.name then
                 socketGroup.mainActiveSkill = i
                 newActiveSkillIndex = i
                 displaySkill = socketGroup.displaySkillList[newActiveSkillIndex]
@@ -138,35 +143,32 @@ function pob.updateBuild()
                 break
             end
         end
-        if newGroupName ~= pickedGroupName then
-            error("Previous active skill not found")
+        if newGroupName ~= prevSkill.group then
+            error("Unable to update safely: Previous active skill not found (was '"..prevSkill.name.."')")
         end
     end
 
     local newPartIndex = activeEffect.grantedEffect.parts and activeEffect.srcInstance.skillPart
     local newPartName = activeEffect.grantedEffect.parts and activeEffect.grantedEffect.parts[newPartIndex].name
-    -- print("After import sub-skill: "..newPartName)
 
-    if pickedPartIndex and newPartName ~= pickedPartName then
-        print("Active sub-skill doesn't match... fixing")
+    if pickedPartIndex and newPartName ~= prevSkill.part then
+        print("Active sub-skill '"..(newSkill.part).."' doesn't match... fixing")
         for i,part in pairs(activeEffect.grantedEffect.parts) do
-            -- print(inspect(part, {depth=1}))
-            if part.name == pickedPartName then
+            if part.name == prevSkill.part then
                 activeEffect.srcInstance.skillPart = i
                 newPartIndex = i
                 newPartName = part.name
                 break
             end
         end
-        if newPartName ~= pickedPartName then
-            error("Previous active skill-part not found")
+        if newPartName ~= prevSkill.part then
+            error("Unable to update safely: Previous active skill-part not found (was '"..prevSkill.part.."')")
         end
     end
-
-    return result
 end
 
-function pob.findModEffect(modLine)
+
+function pobinterface.findModEffect(modLine)
     -- Construct an empty passive socket node to test in
     local testNode = {id="temporary-test-node", type="Socket", alloc=false, sd={"Temp Test Socket"}, modList={}}
 
@@ -182,23 +184,5 @@ function pob.findModEffect(modLine)
     return {base=baseStats, new=newStats}
 end
 
-function pob.getBaseStats()
-    local _, baseStats = build.calcsTab:GetMiscCalculator()
-    return baseStats
-end
 
-function pob.testItemForDisplay(itemText)
-    local newItem = new("Item", build.targetVersion, itemText)
-    -- if not newItem.base then error("No item base found") end
-
-	newItem:NormaliseQuality() -- Set to top quality
-	newItem:BuildModList()
-
-	-- Extract new item's info to a fake HTML tooltip
-	local tooltip = FakeTooltip:new()
-    build.itemsTab:AddItemTooltip(tooltip, newItem)
-
-    return tooltip.lines
-end
-
-return pob
+return pobinterface

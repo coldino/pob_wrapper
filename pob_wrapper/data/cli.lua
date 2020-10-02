@@ -1,3 +1,9 @@
+--[==[
+    The CLI processor and main loop.
+
+    Simply listens for commands from the wrapper, executes them and returns the encoded results.
+]==]--
+
 local io = require("io")
 local json = require('dkjson')
 local inspect = require("inspect")
@@ -52,7 +58,8 @@ end
 
 -- Main loop
 
-use(require("pob"))
+commands = require("commands")
+use(commands)
 
 print("LUA: Started")
 io.stdout:flush()

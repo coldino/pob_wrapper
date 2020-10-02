@@ -28,7 +28,7 @@ class ProcessWrapper:
     '''Starts a sub-process that can be used in a simple question/response pattern.'''
     process: Popen
 
-    receive_msg_fn = lambda self, msg: print("Lua:", msg)
+    receive_msg_fn = lambda self, msg: print("Lua:", msg, end='')
 
     def __init__(self, debug=False):
         self.debug = debug and True
