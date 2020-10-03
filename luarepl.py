@@ -8,7 +8,6 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.lexers import PygmentsLexer
-from pygments import lex
 from pygments.lexers.scripting import LuaLexer
 
 from pob_wrapper import ExternalError, PathOfBuilding

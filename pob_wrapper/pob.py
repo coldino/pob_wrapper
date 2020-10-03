@@ -35,6 +35,7 @@ html {
 class ExternalError(Exception):
     def __init__(self, status):
         self.status = status
+        super().__init__()
 
 
 def _num_string(value):

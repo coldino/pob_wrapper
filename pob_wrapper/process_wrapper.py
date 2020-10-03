@@ -28,7 +28,7 @@ class ProcessWrapper:
     '''Starts a sub-process that can be used in a simple question/response pattern.'''
     process: Popen
 
-    receive_msg_fn = lambda self, msg: print("Lua:", msg, end='')
+    receive_msg_fn = lambda self, msg: print("Lua: " + msg if msg else '', end='')
 
     def __init__(self, debug=False):
         self.debug = debug and True
@@ -37,6 +37,7 @@ class ProcessWrapper:
         cwd = cwd or os.getcwd()
         self.process = Popen(args, stdin=PIPE, stdout=PIPE, stderr=sys.stderr, universal_newlines=True, cwd=cwd, bufsize=1)
         firstline = self.process.stdout.readline()
+        if firstline == '': raise EOFError("Unable to start subprocess")
         if self.debug: print('===', firstline)
 
     def send(self, txt, ignore_result=False):
@@ -65,6 +66,7 @@ class ProcessWrapper:
 
     def get(self):
         line = self.process.stdout.readline()
+        if line == '': raise EOFError("Subprocess stream ended")
         if self.debug: print('>>>', line)
         return line
 
