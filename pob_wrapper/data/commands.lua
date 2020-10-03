@@ -28,6 +28,10 @@ end
 
 function commands.getBuildInfo(out)
     out = out or {}
+    if not build.spec then
+        print("Warning: No build loaded")
+        return out
+    end
     out.buildName = build.buildName
     out.file = {path=build.dbFileName, subpath = build.dbFileSubPath}
     out.char = {
@@ -64,10 +68,17 @@ function commands.saveBuildAs(path)
 end
 
 function commands.updateBuild()
+    -- Remember previously selected skill
+    local prevSkill = pobinterface.readSkillSelection()
+    print("Skill group/gem/part: "..pobinterface.skillString(prevSkill))
+
+    -- Update
     pobinterface.updateBuild()
 
-    local afterSkill = pobinterface.readSkillSelection()
-    print("Final group/gem/part: "..pobinterface.skillString(afterSkill))
+    -- Restore previously selected skill
+    print("After group/gem/part: "..pobinterface.skillString())
+    pobinterface.selectSkill(prevSkill)
+    print("Fixed group/gem/part: "..pobinterface.skillString())
 end
 
 function commands.findModEffect(modLine)
