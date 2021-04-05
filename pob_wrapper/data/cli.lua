@@ -33,7 +33,15 @@ end
 
 local function doline(line)
     result = nil
-    local fn, err = loadstring("record(" .. line .. ")", "<input>")
+    local str = nil
+    if line and string.sub(line, 1, 1) == ":" then
+        -- Statement mode
+        str = string.sub(line, 2, -1) .. "\nrecord(nil)"
+    else
+        -- Expression mode
+        str = "record(" .. line .. ")"
+    end
+    local fn, err = loadstring(str, "<input>")
     print("!*>>>>>>>>>>>>*!")
     if not fn then
         msg = {status='parse_fail', error=err}
