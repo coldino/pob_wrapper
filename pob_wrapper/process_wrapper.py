@@ -7,7 +7,6 @@ from typing import *
 from .popen_job import Popen
 
 __all__ = [
-    'ExternalError',
     'ProcessWrapper',
     'safe_string',
 ]

@@ -3,7 +3,7 @@ from pathlib import Path
 from pprint import pprint
 
 from prompt_toolkit import PromptSession
-from prompt_toolkit import print_formatted_text as print
+from prompt_toolkit import print_formatted_text as print  # pylint: disable=redefined-builtin
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.formatted_text import PygmentsTokens
 from prompt_toolkit.history import FileHistory
@@ -35,7 +35,7 @@ def run():
         while True:
             text = session.prompt('Lua > ')
             try:
-                result = pob._send(text)
+                result = pob.direct_send(text)
                 pprint(result)
             except ExternalError as err:
                 print("ERROR:", err.status.get('error', err.status))
@@ -48,4 +48,4 @@ def run():
 
 
 if __name__ == '__main__':
-    pob = run()
+    run()

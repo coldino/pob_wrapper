@@ -4,7 +4,7 @@ import re
 from typing import *
 
 import pkg_resources
-from win32com.shell import shell, shellcon
+from win32com.shell import shell, shellcon  # pylint: disable=import-error,no-name-in-module
 
 from .process_wrapper import ProcessWrapper, safe_string
 
@@ -160,6 +160,8 @@ class PathOfBuilding:
         if not result or result['status'] != 'success':
             raise ExternalError(result)
         return result.get('result', None)
+
+    direct_send = _send
 
     def kill(self):
         if self.pob:
