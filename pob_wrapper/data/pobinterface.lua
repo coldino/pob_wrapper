@@ -6,6 +6,7 @@
 
 local pobinterface = {}
 
+if GlobalCache then GlobalCache.useFullDPS = true end
 
 function pobinterface.loadBuild(path)
     local buildXml = loadText(path)
