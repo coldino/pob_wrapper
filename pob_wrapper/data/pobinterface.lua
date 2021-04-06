@@ -8,6 +8,14 @@ local pobinterface = {}
 
 if GlobalCache then GlobalCache.useFullDPS = true end
 
+function newItem(itemText)
+    if build.targetVersionData then -- handle code format changes in 1.4.170.17
+        return new("Item", build.targetVersion, itemText)
+    else
+        return new("Item", itemText)
+    end
+end
+
 function pobinterface.loadBuild(path)
     local buildXml = loadText(path)
     loadBuildFromXML(buildXml)
@@ -211,7 +219,7 @@ function pobinterface.findModEffect(modLine)
 
     -- Construct jewel with the mod just to use its mods in the passive node
     local itemText = "Test Jewel\nCobalt Jewel\n"..modLine
-    local item = new("Item", itemText)
+    local item = newItem(itemText)
     testNode.modList = item.modList
 
     -- Calculate stat differences
@@ -219,6 +227,23 @@ function pobinterface.findModEffect(modLine)
     local newStats = calcFunc({ addNodes={ [testNode]=true } })
 
     return {base=baseStats, new=newStats}
+end
+
+
+function pobinterface.testItemForDisplay(itemText)
+    local item = newItem(itemText)
+
+    if item.base then
+        item:NormaliseQuality() -- Set to top quality
+        item:BuildModList()
+
+        -- Extract new item's info to a fake tooltip
+        local tooltip = FakeTooltip:new()
+        build.itemsTab:AddItemTooltip(tooltip, item)
+
+        return tooltip.lines
+    end
+
 end
 
 

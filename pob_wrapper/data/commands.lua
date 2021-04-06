@@ -87,5 +87,19 @@ function commands.findModEffect(modLine)
     return results
 end
 
+function commands.testItemForDisplay(itemText)
+    print("Testing item")
+    local results = pobinterface.testItemForDisplay(itemText)
+    return results
+end
+
+function commands.getKeys(tab)
+    local keys = {}
+    for k,v in pairs(tab) do
+        keys[#keys+1]=k
+    end
+    return keys
+end
+
 
 return commands
