@@ -1,10 +1,11 @@
 import atexit
 import os
 import re
+import sys
 from typing import *
 
 import pkg_resources
-from win32com.shell import shell, shellcon  # pylint: disable=import-error,no-name-in-module
+from win32com.shell import shell, shellcon  # type: ignore
 
 from .process_wrapper import ProcessWrapper, safe_string
 
@@ -33,6 +34,7 @@ html {
 
 
 class ExternalError(Exception):
+
     def __init__(self, status):
         self.status = status
         super().__init__()
@@ -77,13 +79,22 @@ def _calculate_diff(base_values, new_values):
 
 
 class PathOfBuilding:
+
     def __init__(self, pob_path, pob_install, verbose=False):
         self.verbose = verbose and True
         data_dir = pkg_resources.resource_filename('pob_wrapper', 'data')
         docs = shell.SHGetFolderPath(0, shellcon.CSIDL_PERSONAL, None, 0)
 
-        os.environ['PATH'] = f'{pob_install};{os.environ["PATH"]}'
-        os.environ['LUA_PATH'] = f'{data_dir}\\?.lua;{pob_path}\\lua\\?.lua;{pob_install}\\lua\\?.lua'
+        lua_path_parts = [
+            f'{data_dir}\\?.lua;{pob_path}\\lua\\?.lua',
+            f'{pob_install}\\lua\\?.lua',
+            f'{pob_install}\\lua\\?\\init.lua',
+        ]
+        if pob_path != pob_install:
+            lua_path_parts.append(f'{pob_path}\\lua\\?.lua')
+            lua_path_parts.append(f'{pob_path}\\lua\\?\\init.lua')
+
+        os.environ['LUA_PATH'] = ';'.join(lua_path_parts)
         os.environ['LUA_CPATH'] = f'{pob_install}\\?.dll'
 
         os.environ['POB_USERPATH'] = docs
@@ -154,8 +165,11 @@ class PathOfBuilding:
         return result
 
     def _send(self, line, ignore_result=False) -> Any:
+        if not self.pob:
+            raise BrokenPipeError('POB is already disposed')
+
         result = self.pob.send(line, ignore_result=ignore_result)
-        if ignore_result:
+        if ignore_result or result is True:
             return True
         if not result or result['status'] != 'success':
             raise ExternalError(result)
