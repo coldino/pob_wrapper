@@ -1,8 +1,7 @@
 import json
 import os
-import sys
 from subprocess import PIPE, STDOUT
-from typing import *
+from typing import List
 
 from .popen_job import Popen
 
@@ -34,10 +33,13 @@ class ProcessWrapper:
 
     def start(self, args: List[str], cwd=None):
         cwd = cwd or os.getcwd()
-        self.process = Popen(args, stdin=PIPE, stdout=PIPE, stderr=sys.stderr, universal_newlines=True, cwd=cwd, bufsize=1)
+        self.process = Popen(args, stdin=PIPE, stdout=PIPE, stderr=STDOUT, universal_newlines=True, cwd=cwd, bufsize=1)
+        if not self.process.stdout or not self.process.stdin:
+            raise ChildProcessError("Unable to start subprocess")
         firstline = self.process.stdout.readline()
         if firstline == '': raise EOFError("Unable to start subprocess")
         if self.debug: print('===', firstline)
+        return firstline
 
     def send(self, txt, ignore_result=False):
         '''Not yet thread-safe!'''

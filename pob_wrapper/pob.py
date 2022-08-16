@@ -102,7 +102,11 @@ class PathOfBuilding:
         os.environ['POB_RUNTIMEPATH'] = pob_install
 
         self.pob = ProcessWrapper(debug=self.verbose)
-        self.pob.start([f'{data_dir}/luajit.exe', f'{data_dir}\\cli.lua'], cwd=pob_path)
+        firstline = self.pob.start([f'{data_dir}/luajit.exe', f'{data_dir}\\cli.lua'], cwd=pob_path)
+        if firstline != 'LUA: Started\n':
+            stdin, stderr = self.pob.process.communicate()
+            raise ChildProcessError((stdin or '') + (stderr or ''))
+
         atexit.register(self.kill)
 
     def require(self, module):

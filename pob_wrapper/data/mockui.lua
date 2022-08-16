@@ -230,8 +230,7 @@ runCallback("OnFrame") -- Need at least one frame for everything to initialise
 
 if mainObject.promptMsg then
     -- Something went wrong during startup
-    print(mainObject.promptMsg)
-    io.read("*l")
+    error("ERROR: "..mainObject.promptMsg)
     return
 end
 
