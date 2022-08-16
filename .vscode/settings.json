@@ -14,13 +14,10 @@
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": [],
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
-    "python.linting.mypyEnabled": true,
-    "python.linting.lintOnSave": true,
-    "python.jediEnabled": false,
     "python.sortImports.args": ["--settings-path=${workspaceFolder}/setup.cfg"],
     "python.formatting.provider": "yapf",
+    "python.languageServer": "Default",
+    "python.analysis.typeCheckingMode": "basic",
     "[python]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
