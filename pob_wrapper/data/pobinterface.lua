@@ -6,6 +6,10 @@
 
 local pobinterface = {}
 
+if calcs == nil or calcs.calcFullDPS == nil then
+    error("Path of Building Community 2.0.0 minimum required")
+end
+
 if GlobalCache then GlobalCache.useFullDPS = true end
 
 function newItem(itemText)
@@ -148,6 +152,7 @@ function pobinterface.updateBuild()
 end
 
 
+-- Select a skill (same format as readSkillSelection)
 function pobinterface.selectSkill(prevSkill)
     local newSkill = pobinterface.readSkillSelection()
 
@@ -226,7 +231,30 @@ function pobinterface.findModEffect(modLine)
     local calcFunc, baseStats = build.calcsTab:GetMiscCalculator()
     local newStats = calcFunc({ addNodes={ [testNode]=true } })
 
-    return {base=baseStats, new=newStats}
+    -- Construct base, new, diff output, leaving out anything empty values
+    out = {base={}, new={}, diff={}}
+
+    for k,v in pairs(baseStats) do
+        if type(v) == 'number' then
+            if (v < -0.05) or (v > 0.05) then out.base[k] = v end
+        elseif type(v) ~= 'nil' then
+            out.base[k] = v
+        end
+    end
+
+    for k,v in pairs(newStats) do
+        if type(v) == 'number' then
+            if (v < -0.05) or (v > 0.05) then out.new[k] = v end
+
+            local d = (newStats[k] or 0) - (baseStats[k] or 0)
+            if (d < -0.05) or (d > 0.05) then out.diff[k] = d end
+        elseif newStats[k] ~= baseStats[k] then
+            out.new[k] = v
+            out.diff[k] = v
+        end
+    end
+
+    return out
 end
 
 

@@ -218,15 +218,6 @@ function isValidString(s, expression)
     return s and s:match(expression or '%S') and true or false
 end
 
--- l_require = require
--- function require(name)
--- 	-- Hack to stop it looking for lcurl, which we don't really need
--- 	if name == "lcurl.safe" then
--- 		return
--- 	end
---     return l_require(name)
--- end
-
 
 dofile("Launch.lua")
 
@@ -246,6 +237,7 @@ end
 
 -- The build module; once a build is loaded, you can find all the good stuff in here
 build = mainObject.main.modes["BUILD"]
+calcs = build.calcsTab.calcs
 
 -- Here's some helpful helper functions to help you get started
 function newBuild()
